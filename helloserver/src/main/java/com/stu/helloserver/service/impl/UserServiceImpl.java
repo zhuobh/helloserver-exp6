@@ -11,6 +11,7 @@ import com.stu.helloserver.common.ResultCode;
 import com.stu.helloserver.dto.UserDTO;
 import com.stu.helloserver.mapper.UserInfoMapper;
 import com.stu.helloserver.mapper.UserMapper;
+import com.stu.helloserver.security.JwtUtil;
 import com.stu.helloserver.service.UserService;
 import com.stu.helloserver.vo.UserDetailVO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,10 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private StringRedisTemplate redisTemplate;
+
+    // 👇 注入 JWT 工具类
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @Override
     public Result<String> register(UserDTO userDTO) {
@@ -61,7 +66,10 @@ public class UserServiceImpl implements UserService {
         if (!dbUser.getPassword().equals(userDTO.getPassword())) {
             return Result.error(ResultCode.PASSWORD_ERROR);
         }
-        return Result.success("登录成功!");
+
+        // 👇 登录成功生成 JWT 并返回
+        String jwt = jwtUtil.generateToken(userDTO.getUsername());
+        return Result.success(jwt);
     }
 
     @Override
@@ -145,6 +153,6 @@ public class UserServiceImpl implements UserService {
         String key = CACHE_KEY_PREFIX + userId;
         redisTemplate.delete(key);
 
-        return Result.success("用户删除成功");
+        return Result.success("删除成功");
     }
 }
