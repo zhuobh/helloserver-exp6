@@ -29,9 +29,10 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(auth -> auth
-                        // 只放行 登录 + 注册
+                        // 放行 登录 + 注册 + 聊天接口
                         .requestMatchers(HttpMethod.POST, "/api/users/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/chat").permitAll()
 
                         // 👇 其他所有接口 必须认证（携带Token）
                         .anyRequest().authenticated()
